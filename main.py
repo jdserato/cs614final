@@ -2,7 +2,7 @@ import func
 
 status = 0
 all_vars = {}
-reserved = {'IF', 'WHILE', 'OUTPUT', 'INPUT', 'START', 'STOP', 'VAR', 'AS', 'CHAR', 'INT', 'BOOL', 'FLOAT', 'ELSE'}
+reserved = {'IF', 'WHILE', 'OUTPUT', 'INPUT', 'START', 'STOP', 'VAR', 'AS', 'CHAR', 'INT', 'BOOL', 'FLOAT', 'ELSE', 'SWITCH', 'CASE', 'DEFAULT'}
 ints = []
 floats = []
 chars = []
@@ -11,12 +11,12 @@ lines = []
 line_num = 0
 find_stop = False
 find_stat = 0
-if_st = 0
-while_st = 0
 statements = []
 prevstops = []
 backline = []
-with open("testcases/source3.txt", "rt") as f:
+sw_res = []
+sw_ind = []
+with open("testcases/source2.txt", "rt") as f:
 	for line in f:
 		lines.append(line)
 	while line_num < len(lines):
@@ -91,17 +91,38 @@ with open("testcases/source3.txt", "rt") as f:
 				exit()
 			if func.indented(line, status):
 				line = line[status:]
+				# print(line)
 				if line[:5] == "START":
 					status += 1
 					continue
 				if find_stop:
 					continue
+				if len(statements) > 0 and statements[len(statements)-1] == "SWITCH" and sw_ind[len(sw_ind)-1] == status:
+					if line[:4] == "CASE" or line[:7] == "DEFAULT":
+						status += 1
+						if line[:4] == "CASE":
+							statements.append("CASE")
+							res = func.check_valid(line[5:], all_vars, ints, floats, bools, chars)
+							if res == sw_res[len(sw_res)-1]:
+								# print("it is true")
+								prevstops.append(False)
+							else:
+								# find stop
+								find_stop = True
+								prevstops.append(True)
+								find_stat = status
+						else:
+							statements.append("DEFAULT")
+							find_stop = False
+						continue
+					else:
+						print("Expected CASE statement")
+						exit()
 				if line[:6] == "OUTPUT":
 					func.output(line[7:], all_vars, ints, floats, chars, bools)
 				elif line[:5] == "INPUT":
 					all_vars.update(func.inp(line[6:], all_vars, ints, floats, chars, bools))
 				elif line[:2] == "IF": # if statement.
-					if_st += 1
 					statements.append("IF")
 					status += 1
 					res = func.check_valid(line[3:], all_vars, ints, floats, bools, chars)
@@ -116,7 +137,7 @@ with open("testcases/source3.txt", "rt") as f:
 					else:
 						print("Invalid BOOL expression")
 						exit()
-				elif line[:4] == "ELSE": # else statement
+				elif line[:4] == "ELSE": # else statement, should not run
 					print(statements, "has been authorized for some reason")
 					if len(statements) > 0 and statements[len(statements)-1] == "IF":
 						statements.pop()
@@ -139,6 +160,13 @@ with open("testcases/source3.txt", "rt") as f:
 						# find stop
 						find_stop = True
 						prevstops.append(True)
+				elif line[:6] == "SWITCH":
+					statements.append("SWITCH")
+					backline.append(line_num)
+					status += 1
+					res = func.check_valid(line[7:], all_vars, ints, floats, bools, chars)
+					sw_res.append(res)
+					sw_ind.append(status+1)
 				else:
 					expr = line.split("=")
 					chk = len(expr)-1
@@ -214,3 +242,14 @@ with open("testcases/source3.txt", "rt") as f:
 							if prevstops.pop() == False:
 								line_num = prevline - 1
 							find_stop = False
+						elif state == "SWITCH":
+							sw_ind.pop()
+							sw_res.pop()
+							find_stop = False
+						elif state == "CASE":
+							if prevstops.pop() == False:
+								find_stop = True
+							else:
+								find_stop == False
+						elif state == "DEFAULT":
+							find_stop = True

@@ -1,6 +1,59 @@
-VAR xyz, abc=100 AS INT
+VAR xyz=7, abc=100, AS INT
 START
-	xyz= ((abc *5)/10 + 10) * -1
-	* xyz should have the value -60
-	OUTPUT: "[[]" & xyz & "[]]"
+	SWITCH abc
+		START
+			CASE 10
+				START
+					OUTPUT: "one"
+				STOP
+			CASE 2
+				START
+					OUTPUT: "two"
+				STOP
+			CASE 100
+				START
+					SWITCH xyz
+						START
+							CASE 5
+								START
+									OUTPUT: "lima"
+								STOP
+							DEFAULT
+								START
+									OUTPUT: "uban"
+								STOP
+						STOP
+					OUTPUT: "a hundred"
+				STOP
+			DEFAULT
+				START
+					OUTPUT: "none"
+				STOP
+		STOP
+
+	IF (9+10 == 109):
+		START
+			OUTPUT: "yey" & "#"
+			IF (5 <> 7)
+				START
+					OUTPUT: "mabuhay"
+				STOP
+			ELSE
+				START
+					OUTPUT: "mamatay"
+				STOP
+		STOP
+	ELSE:
+		START
+			OUTPUT: "nay" & "#"
+			IF (5 <> 5)
+				START
+					OUTPUT: "mabuhay"
+				STOP
+			ELSE
+				START
+					OUTPUT: "mamatay"
+				STOP
+		STOP
+	OUTPUT: "done"
 STOP
