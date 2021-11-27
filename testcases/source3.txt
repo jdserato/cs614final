@@ -1,0 +1,45 @@
+VAR X23, x=1, y = 1 AS INT
+VAR z='w' AS CHAR
+VAR t="TRUE" AS BOOL
+START
+	WHILE (x <= 10):
+		START
+			IF (NOT t)
+				START
+					y = 1
+					WHILE (y < 5):
+						START
+							y = y + 1
+							OUTPUT: "[*]"
+						STOP
+					OUTPUT: "#"
+					x = x + 1
+				STOP
+		STOP
+
+	IF (9+10 == 109):
+		START
+			OUTPUT: "yey" & "#"
+			IF (5 <> 7)
+				START
+					OUTPUT: "mabuhay"
+				STOP
+			ELSE
+				START
+					OUTPUT: "mamatay"
+				STOP
+		STOP
+	ELSE:
+		START
+			OUTPUT: "nay" & "#"
+			IF (5 <> 5)
+				START
+					OUTPUT: "mabuhay"
+				STOP
+			ELSE
+				START
+					OUTPUT: "mamatay"
+				STOP
+		STOP
+	OUTPUT: "done"
+STOP

@@ -4,7 +4,6 @@ VAR x, w_23='w' AS CHAR
 VAR f, t="TRUE" AS BOOL
 START
 	abc=b=(10+5)*(10-5)
-	INPUT: def, f, plo
 	w_23='a'
 	* this is a comment
 	OUTPUT: abc & "hi" & def & "#" & w_23 & "[#]"

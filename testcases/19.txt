@@ -1,0 +1,5 @@
+VAR x = -8, y AS INT
+START
+	y = -x
+	OUTPUT: y
+STOP

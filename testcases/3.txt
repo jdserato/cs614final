@@ -1,0 +1,4 @@
+VAR d AS INT
+START
+	VAR x as INT
+STOP

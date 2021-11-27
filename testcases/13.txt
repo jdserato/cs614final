@@ -1,0 +1,4 @@
+VAR sa AS BOOL
+START
+	OUTPUT: (2>1 AND (5<>5 AND 1>0 ))
+STOP

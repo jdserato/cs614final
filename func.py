@@ -4,6 +4,9 @@ def comment(line):
 def var(line):
 	return line.strip()[0:3] == "VAR"
 
+def stop(line):
+	return line.strip()[0:4] == "STOP"
+
 def _as(line):
 	return line.strip()[0:2] == "AS"
 
@@ -15,13 +18,16 @@ def next(line):
 	try:
 		ind = line.index(",")
 	except:
-		ind = line.index(" ")
+		ind = line.index(" AS")
 	if eq < ind:
 		return line[ind+1:].strip(), line[:eq].strip(), line[eq+1:ind].strip()
 	return line[ind+1:].strip(), line[:ind].strip(), ""
 
-def indented(line):
-	return line[0] == '\t'
+def indented(line, status):
+	ind = True
+	for i in range(status):
+		ind &= line[i] == '\t'
+	return ind
 
 def check_valid(line, all_vars, ints, floats, bools, chars):
 	par = 0
@@ -41,7 +47,7 @@ def check_valid(line, all_vars, ints, floats, bools, chars):
 				if term == "NOT":
 					terms.append("NOT")
 				else:
-					raise Exception("Unexpected character", c)
+					raise Exception("Unexpected character" + c)
 			par+=1
 			terms.append('(')
 		elif c == ')':
@@ -55,16 +61,23 @@ def check_valid(line, all_vars, ints, floats, bools, chars):
 				try:
 					terms.append(float(term))
 				except Exception as e:
-					raise e
+					try:
+						# print("I tried 1")
+						if term[0] == '-':
+							# print(all_vars[term[1:].strip()])
+							terms.append(-1*all_vars[term[1:].strip()])
+					except Exception:
+						raise e
 			else:
 				term = term.strip()
-				if term[0] == '\'' and term[-1] == '\'':
+				# print(term, terms, "1")
+				if term[0] == '\'' and term[-1] == '\'' or (term == "\"FALSE\"" or term == "\"TRUE\""):
 					terms.append(term[1:-1])
+					# print("appended")
 				elif term in all_vars:
 					terms.append(all_vars[term])
 				else:
 					raise Exception("Unknown variable " + term)
-				terms.append(all_vars[term])
 			term = ''
 			terms.append(')')
 		else:
@@ -76,17 +89,24 @@ def check_valid(line, all_vars, ints, floats, bools, chars):
 					try:
 						terms.append(float(term))
 					except ValueError as e:
-						raise e
+						try:
+							# print("I tried 2")
+							if term[0] == '-':
+								# print(all_vars[term[1:].strip()])
+								terms.append(-1*all_vars[term[1:].strip()])
+						except Exception:
+							raise e
 				elif term != '':
 					term = term.strip()
-					if term[0] == '\'' and term[-1] == '\'':
+					# print(term, terms, "2")
+					if term[0] == '\'' and term[-1] == '\'' or (term == "\"FALSE\"" or term == "\"TRUE\""):
 						terms.append(term[1:-1])
 					elif term in all_vars:
 						terms.append(all_vars[term])
 					else:
 						raise Exception("Unknown variable " + term)
 				term = ''
-				terms.append(line[l_num:l_num+op])
+				terms.append(line[l_num:l_num+op]) 
 				l_num += op
 				wo_par += c
 				continue
@@ -105,15 +125,22 @@ def check_valid(line, all_vars, ints, floats, bools, chars):
 			try:
 				terms.append(float(term))
 			except Exception as e:
-				raise e
+				try:
+					if term[0] == '-':
+						# print(all_vars[term[1:].strip()])
+						terms.append(-1*all_vars[term[1:].strip()])
+				except Exception as e:
+					raise e
 		else:
 			term = term.strip()
-			if term[0] == '\'' and term[-1] == '\'':
+			# print(term, terms)
+			if term[0] == '\'' and term[-1] == '\'' or (term == "\"FALSE\"" or term == "\"TRUE\""):
 				terms.append(term[1:-1])
 			elif term in all_vars:
 				terms.append(all_vars[term])
 			else:
 				raise Exception("Unknown variable " + term)
+	# print(terms)
 	return evaluate(terms)[0]
 
 def is_operator(line, l_num):
@@ -140,10 +167,12 @@ def evaluate(terms):
 					else:
 						par -= 1
 				row += 1
+			# print("eval", terms[par_o+1:row])
 			res = evaluate(terms[par_o+1:row])
 			terms = terms[:par_o] + res + terms[row+1:]
 		except ValueError:
 			while len(terms) > 1:
+				# print(terms)
 				not_op = -1
 				not_cnt = terms.count('NOT')
 				if not_cnt > 0:
@@ -163,6 +192,7 @@ def evaluate(terms):
 				else:
 					break
 			while len(terms) > 1:
+				# print(terms)
 				mul_op = div_op = mod_op = -1
 				mul_cnt = terms.count('*')
 				div_cnt = terms.count('/')
@@ -189,6 +219,7 @@ def evaluate(terms):
 				else:
 					break
 			while len(terms) > 1:
+				# print(terms)
 				add_op = sub_op = -1
 				add_cnt = terms.count('+')
 				sub_cnt = terms.count('-')
@@ -210,6 +241,7 @@ def evaluate(terms):
 				else:
 					break
 			while len(terms) > 1:
+				# print(terms)
 				gt_op = lt_op = gte_op = lte_op = -1
 				gt_cnt = terms.count('>')
 				lt_cnt = terms.count('<')
@@ -233,9 +265,9 @@ def evaluate(terms):
 						ans = lhs > rhs
 					elif least == 1: # less than
 						ans = lhs < rhs
-					if least == 0: # greater than or equal to
+					if least == 2: # greater than or equal to
 						ans = lhs >= rhs
-					elif least == 1: # less than or equal to
+					elif least == 3: # less than or equal to
 						ans = lhs <= rhs
 					if ans == True:
 						ans = 'TRUE'
@@ -245,6 +277,7 @@ def evaluate(terms):
 				else:
 					break
 			while len(terms) > 1:
+				# print(terms)
 				eq_op = neq_op = -1
 				eq_cnt = terms.count('==')
 				neq_cnt = terms.count('<>')
@@ -278,6 +311,7 @@ def evaluate(terms):
 				else:
 					break
 			while len(terms) > 1:
+				# print(terms)
 				and_op = -1
 				and_cnt = terms.count('AND')
 				if and_cnt > 0:
@@ -302,6 +336,7 @@ def evaluate(terms):
 				else:
 					break
 			while len(terms) > 1:
+				# print(terms)
 				or_op = -1
 				or_cnt = terms.count('OR')
 				if or_cnt > 0:
@@ -326,6 +361,7 @@ def evaluate(terms):
 				else:
 					break
 			if len(terms) > 1:
+				# print(terms)
 				raise Exception("Invalid expression")
 			return terms
 
@@ -340,7 +376,7 @@ def find_least(items):
 		_ind += 1
 	return ind
 
-def output(line, all_vars):
+def output(line, all_vars, ints, floats, chars, bools):
 	terms = line.split("&")
 	for term in terms:
 		term = term.strip()
@@ -358,10 +394,12 @@ def output(line, all_vars):
 					print(c, end="")
 				i+=1
 		else:
-			if term in all_vars:
-				print(all_vars[term], end="")
-			else:
-				raise Exception("Unknown variable", term)
+			# try:
+			print(out_eval(term, all_vars, ints, floats, chars, bools), end="")
+			# if term in all_vars:
+			# 	print(all_vars[term], end="")
+			# except:
+				# raise Exception("Unknown variable", term)
 
 def inp(line, all_vars, ints, floats, chars, bools):
 	line = line.strip()
@@ -369,11 +407,11 @@ def inp(line, all_vars, ints, floats, chars, bools):
 	for term in terms:
 		term = term.strip()
 		if term not in all_vars:
-			raise Exception("Undeclared variable:", term)
+			raise Exception("Undeclared variable:" + term)
 	user = input()
 	items = user.split(",")
 	if len(terms) != len(items):
-		raise Exception("Expected input:", len(terms), ", received:", len(items))
+		raise Exception("Expected input:" + len(terms) + ", found:" + len(items))
 	i = 0
 	while i < len(terms):
 		term = terms[i].strip()
@@ -384,12 +422,15 @@ def inp(line, all_vars, ints, floats, chars, bools):
 			all_vars[term] = float(item)
 		elif term in chars:
 			if len(item[1:-1]) != 1 or not (item[0] == item[-1] == '\''):
-				raise Exception("Unable to parse",item,"as CHAR")
+				raise Exception("Unable to parse" + item + "as CHAR")
 			all_vars[term] = item[1:-1]
 		elif term in bools:
 			if item[1:-1] == "TRUE" or item[1:-1] == "FALSE":
 				all_vars[term] = item[1:-1]
 			else:
-				raise Exception("Unable to parse",item,"as BOOL")
+				raise Exception("Unable to parse" +item +"as BOOL")
 		i += 1
 	return all_vars
+
+def out_eval(term, all_vars, ints, floats, chars, bools):
+	return check_valid(term, all_vars, ints, floats, chars, bools)

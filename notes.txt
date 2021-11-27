@@ -1,0 +1,5 @@
+consider true false [done]
+operation in output [done]
+single declaration var [done]
+block reserved [done]
+nega direct [done]

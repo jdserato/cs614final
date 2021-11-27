@@ -1,0 +1,5 @@
+VAR x AS INT
+START
+	x = (5 + 2 * 6 - 10/2)
+	OUTPUT: x
+STOP

@@ -1,0 +1,5 @@
+VAR f AS BOOL
+START
+	f=(3==3 AND 7>4)
+	OUTPUT: f
+STOP

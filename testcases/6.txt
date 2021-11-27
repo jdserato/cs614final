@@ -1,0 +1,5 @@
+VAR a = 6, b AS INT
+START
+	a=a+2 
+	OUTPUT: a
+STOP

@@ -1,0 +1,5 @@
+VAR sa AS INT
+START
+	sa = (6 + (9/3) - (2*1))
+	OUTPUT: sa
+STOP

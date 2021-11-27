@@ -1,0 +1,8 @@
+VAR abc=2, b=1 AS INT
+VAR w_23='w' AS CHAR
+VAR t="TRUE" AS BOOL
+START
+	abc=b=8
+	w_23='b'
+	OUTPUT: abc & "#" & "hi" & b & "#" & w_23 & "[&]" & (t AND "FALSE") 
+STOP

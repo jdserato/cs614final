@@ -1,0 +1,4 @@
+VAR x=7 AS INT
+START
+	OUTPUT: x + 5 
+STOP

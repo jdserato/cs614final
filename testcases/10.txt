@@ -1,0 +1,5 @@
+VAR y = 5 AS INT
+VAR x=2 AS INT
+START
+	OUTPUT: x+y
+STOP

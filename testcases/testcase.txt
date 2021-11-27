@@ -1,0 +1,31 @@
+VAR X23, x=1 AS INT
+VAR z='w' AS CHAR
+VAR t="TRUE" AS BOOL
+VAR y=1 AS FLOAT
+START
+	IF (9+10 == 109):
+		START
+			OUTPUT: "yey" & "#"
+			IF (5 <> 7)
+				START
+					OUTPUT: "mabuhay"
+				STOP
+			ELSE
+				START
+					OUTPUT: "mamatay"
+				STOP
+		STOP
+	ELSE:
+		START
+			OUTPUT: "nay" & "#"
+			IF (5 <> 5)
+				START
+					OUTPUT: "mabuhay"
+				STOP
+			ELSE
+				START
+					OUTPUT: "mamatay"
+				STOP
+		STOP
+	OUTPUT: "done"
+STOP

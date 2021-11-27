@@ -2,15 +2,27 @@ import func
 
 status = 0
 all_vars = {}
+reserved = {'IF', 'WHILE', 'OUTPUT', 'INPUT', 'START', 'STOP', 'VAR', 'AS', 'CHAR', 'INT', 'BOOL', 'FLOAT', 'ELSE'}
 ints = []
 floats = []
 chars = []
 bools = []
+lines = []
 line_num = 0
-with open("source.txt", "rt") as f:
+find_stop = False
+find_stat = 0
+if_st = 0
+while_st = 0
+statements = []
+prevstops = []
+backline = []
+with open("testcases/source3.txt", "rt") as f:
 	for line in f:
+		lines.append(line)
+	while line_num < len(lines):
+		line = lines[line_num]
 		line_num += 1
-		if func.comment(line):
+		if len(line.strip()) == 0 or func.comment(line):
 			continue
 		if status == 0:
 			if line == "START\n":
@@ -26,6 +38,10 @@ with open("source.txt", "rt") as f:
 				for k in vars.keys():
 					if k in all_vars:
 						print("The variable", k, "has been previously declared")
+						exit()
+					if k in reserved or not ((k[0] >= 'a' and k[0] <= 'z') or (k[0] >= 'A' and k[0] <= 'Z') or k[0] == '_'):
+						print("Invalid variable declaration:", k)
+						exit()  
 				if line == "INT":
 					for k, v in vars.items():
 						try:
@@ -70,13 +86,59 @@ with open("source.txt", "rt") as f:
 								exit()
 						bools.append(k)
 
-		elif status == 1:
-			if func.indented(line):
-				line = line[1:]
+		else:
+			if func.stop(line) and status == 0:
+				exit()
+			if func.indented(line, status):
+				line = line[status:]
+				if line[:5] == "START":
+					status += 1
+					continue
+				if find_stop:
+					continue
 				if line[:6] == "OUTPUT":
-					func.output(line[7:], all_vars)
+					func.output(line[7:], all_vars, ints, floats, chars, bools)
 				elif line[:5] == "INPUT":
 					all_vars.update(func.inp(line[6:], all_vars, ints, floats, chars, bools))
+				elif line[:2] == "IF": # if statement.
+					if_st += 1
+					statements.append("IF")
+					status += 1
+					res = func.check_valid(line[3:], all_vars, ints, floats, bools, chars)
+					if res == 'TRUE':
+						# print("it is true")
+						prevstops.append(False)
+					elif res == "FALSE":
+						# find stop
+						find_stop = True
+						prevstops.append(True)
+						find_stat = status
+					else:
+						print("Invalid BOOL expression")
+						exit()
+				elif line[:4] == "ELSE": # else statement
+					print(statements, "has been authorized for some reason")
+					if len(statements) > 0 and statements[len(statements)-1] == "IF":
+						statements.pop()
+						if lines[line_num][status:][:4] == "ELSE":
+							status += 1
+							line_num += 1
+							find_stop = not prevstops.pop()
+					else:
+						print("Unexpected ELSE statement")
+						exit()
+				elif line[:5] == "WHILE": 
+					statements.append("WHILE")
+					backline.append(line_num)
+					status += 1
+					res = func.check_valid(line[6:], all_vars, ints, floats, bools, chars)
+					if res == 'TRUE':
+						# print("it is true")
+						prevstops.append(False)
+					elif res == "FALSE":
+						# find stop
+						find_stop = True
+						prevstops.append(True)
 				else:
 					expr = line.split("=")
 					chk = len(expr)-1
@@ -89,11 +151,11 @@ with open("source.txt", "rt") as f:
 								strcmb = expr[chk-1] + expr[chk-1][-1:] == "<" + "=" + expr[chk]
 								expr = expr[:chk-1] + [strcmb] + expr[chk+1:]
 						chk-=1
-					# try:
-					res = func.check_valid(expr[len(expr)-1], all_vars, ints, floats, bools, chars)
-					# except Exception as e:
-						# print(e, "in line", line_num)
-						# exit()
+					try:
+						res = func.check_valid(expr[len(expr)-1], all_vars, ints, floats, bools, chars)
+					except Exception as e:
+						print(e, "in line", line_num)
+						exit()
 					i = 0
 					while i < len(expr)-1:
 						expr[i] = expr[i].strip()
@@ -127,6 +189,28 @@ with open("source.txt", "rt") as f:
 							exit()
 						i += 1
 			else:
-				if line != "STOP":
-					print("Expected indent at line", line_num)
+				if line[status-1:][:4] != "STOP":
+					print("Expected indent at line", line_num, "errcode:", status)
 					exit()
+				else:
+					# print("stop detected in status", status, "line", line_num)
+					if find_stop and find_stat == status-1:
+						find_stop = False
+					status -= 2
+					# print("status", status, "line", lines[line_num-1], "at line", line_num)
+					if len(statements) > 0 :
+						# print(statements)
+						state = statements.pop()
+						if state == "IF":
+							# print("then", statements)
+							if lines[line_num][status:][:4] == "ELSE":
+								# print("EXECUTE")
+								statements.append("ELSE")
+								status += 1
+								line_num += 1
+								find_stop = not prevstops.pop()
+						elif state == "WHILE":
+							prevline = backline.pop()
+							if prevstops.pop() == False:
+								line_num = prevline - 1
+							find_stop = False

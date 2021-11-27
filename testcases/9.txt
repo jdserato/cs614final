@@ -1,0 +1,6 @@
+VAR x AS FLOAT
+VAR y = 5, z  AS INT
+START
+	x = y + 4.5
+	OUTPUT: x
+STOP

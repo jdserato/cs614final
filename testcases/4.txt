@@ -1,0 +1,4 @@
+VAR a = 10.4 AS FLOAT
+START
+	OUTPUT: a
+STOP
