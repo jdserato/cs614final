@@ -1,45 +1,27 @@
-VAR X23, x=1, y = 1 AS INT
-VAR z='w' AS CHAR
-VAR t="TRUE" AS BOOL
+VAR xyz=7, abc=20, samp=0 AS INT
 START
-	WHILE (x <= 10):
+	WHILE (samp < abc)
 		START
-			IF (NOT t)
+			SWITCH samp
 				START
-					y = 1
-					WHILE (y < 5):
+					CASE 2
 						START
-							y = y + 1
-							OUTPUT: "[*]"
+							WHILE (samp < 10)
+								START
+									OUTPUT: samp
+									samp = samp + 2
+								STOP
 						STOP
-					OUTPUT: "#"
-					x = x + 1
+					CASE 15
+						START
+							OUTPUT: "lima#"
+						STOP
+					DEFAULT
+						START
+							OUTPUT: samp & "#"
+						STOP
 				STOP
-		STOP
-
-	IF (9+10 == 109):
-		START
-			OUTPUT: "yey" & "#"
-			IF (5 <> 7)
-				START
-					OUTPUT: "mabuhay"
-				STOP
-			ELSE
-				START
-					OUTPUT: "mamatay"
-				STOP
-		STOP
-	ELSE:
-		START
-			OUTPUT: "nay" & "#"
-			IF (5 <> 5)
-				START
-					OUTPUT: "mabuhay"
-				STOP
-			ELSE
-				START
-					OUTPUT: "mamatay"
-				STOP
+			samp = samp + 1
 		STOP
 	OUTPUT: "done"
 STOP

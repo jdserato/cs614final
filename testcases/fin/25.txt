@@ -1,0 +1,12 @@
+VAR x=1, y=0 AS INT
+START
+	IF (8>2)
+		START
+			WHILE (y<4)
+				START
+					y=y+1
+				STOP
+			OUTPUT: y
+		STOP
+STOP
+

@@ -1,0 +1,16 @@
+VAR x=5 AS INT
+START
+	WHILE (x<10)
+		START
+			IF (x>7)
+				START
+					OUTPUT: x + 1 & "#"
+				STOP
+			ELSE
+				START
+					OUTPUT: x & "#"
+				STOP
+			x=x+1
+		STOP
+STOP
+

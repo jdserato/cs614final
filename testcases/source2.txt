@@ -2,7 +2,7 @@ VAR xyz=7, abc=100, AS INT
 START
 	SWITCH abc
 		START
-			CASE 10
+			CASE xyz
 				START
 					OUTPUT: "one"
 				STOP
@@ -28,31 +28,6 @@ START
 			DEFAULT
 				START
 					OUTPUT: "none"
-				STOP
-		STOP
-
-	IF (9+10 == 109):
-		START
-			OUTPUT: "yey" & "#"
-			IF (5 <> 7)
-				START
-					OUTPUT: "mabuhay"
-				STOP
-			ELSE
-				START
-					OUTPUT: "mamatay"
-				STOP
-		STOP
-	ELSE:
-		START
-			OUTPUT: "nay" & "#"
-			IF (5 <> 5)
-				START
-					OUTPUT: "mabuhay"
-				STOP
-			ELSE
-				START
-					OUTPUT: "mamatay"
 				STOP
 		STOP
 	OUTPUT: "done"

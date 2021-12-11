@@ -133,7 +133,6 @@ def check_valid(line, all_vars, ints, floats, bools, chars):
 					raise e
 		else:
 			term = term.strip()
-			# print(term, terms)
 			if term[0] == '\'' and term[-1] == '\'' or (term == "\"FALSE\"" or term == "\"TRUE\""):
 				terms.append(term[1:-1])
 			elif term in all_vars:
@@ -361,7 +360,7 @@ def evaluate(terms):
 				else:
 					break
 			if len(terms) > 1:
-				# print(terms)
+				print(terms)
 				raise Exception("Invalid expression")
 			return terms
 
@@ -377,7 +376,7 @@ def find_least(items):
 	return ind
 
 def output(line, all_vars, ints, floats, chars, bools):
-	terms = line.split("&")
+	terms = line.split(" & ")
 	for term in terms:
 		term = term.strip()
 		if term[0] == "\"" and term[-1] == "\"":

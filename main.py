@@ -16,7 +16,7 @@ prevstops = []
 backline = []
 sw_res = []
 sw_ind = []
-with open("testcases/source2.txt", "rt") as f:
+with open("testcases/source3.txt", "rt") as f:
 	for line in f:
 		lines.append(line)
 	while line_num < len(lines):
@@ -60,7 +60,7 @@ with open("testcases/source2.txt", "rt") as f:
 								all_vars[k] = 0
 							else:
 								all_vars[k] = float(v)
-							ints.append(k)
+							floats.append(k)
 						except:
 							print("Unable to parse",v,"as FLOAT")
 							exit()
@@ -91,7 +91,7 @@ with open("testcases/source2.txt", "rt") as f:
 				exit()
 			if func.indented(line, status):
 				line = line[status:]
-				# print(line)
+				# print("line", line, "status", status)
 				if line[:5] == "START":
 					status += 1
 					continue
@@ -149,8 +149,10 @@ with open("testcases/source2.txt", "rt") as f:
 						print("Unexpected ELSE statement")
 						exit()
 				elif line[:5] == "WHILE": 
+					# print("While detected")
 					statements.append("WHILE")
 					backline.append(line_num)
+					# print(backline)
 					status += 1
 					res = func.check_valid(line[6:], all_vars, ints, floats, bools, chars)
 					if res == 'TRUE':
@@ -161,8 +163,9 @@ with open("testcases/source2.txt", "rt") as f:
 						find_stop = True
 						prevstops.append(True)
 				elif line[:6] == "SWITCH":
+					# print(line, "line")
 					statements.append("SWITCH")
-					backline.append(line_num)
+					# backline.append(line_num)
 					status += 1
 					res = func.check_valid(line[7:], all_vars, ints, floats, bools, chars)
 					sw_res.append(res)
@@ -179,11 +182,12 @@ with open("testcases/source2.txt", "rt") as f:
 								strcmb = expr[chk-1] + expr[chk-1][-1:] == "<" + "=" + expr[chk]
 								expr = expr[:chk-1] + [strcmb] + expr[chk+1:]
 						chk-=1
-					try:
-						res = func.check_valid(expr[len(expr)-1], all_vars, ints, floats, bools, chars)
-					except Exception as e:
-						print(e, "in line", line_num)
-						exit()
+					# try:
+					# print("expr", expr[len(expr)-1])
+					res = func.check_valid(expr[len(expr)-1], all_vars, ints, floats, bools, chars)
+					# except Exception as e:
+						# print(e, "in line", line_num)
+						# exit()
 					i = 0
 					while i < len(expr)-1:
 						expr[i] = expr[i].strip()
@@ -225,6 +229,7 @@ with open("testcases/source2.txt", "rt") as f:
 					if find_stop and find_stat == status-1:
 						find_stop = False
 					status -= 2
+					# print("new status", status)
 					# print("status", status, "line", lines[line_num-1], "at line", line_num)
 					if len(statements) > 0 :
 						# print(statements)
@@ -241,6 +246,7 @@ with open("testcases/source2.txt", "rt") as f:
 							prevline = backline.pop()
 							if prevstops.pop() == False:
 								line_num = prevline - 1
+								# print("GOTO", line_num, "stat", status)
 							find_stop = False
 						elif state == "SWITCH":
 							sw_ind.pop()
